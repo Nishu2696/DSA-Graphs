@@ -1,0 +1,33 @@
+Question Link: https://www.geeksforgeeks.org/problems/depth-first-traversal-for-a-graph/1
+
+class Solution {
+    // Function to return a list containing the DFS traversal of the graph.
+    public ArrayList<Integer> dfsOfGraph(ArrayList<ArrayList<Integer>> adj) {
+        // Code here
+        int n = Integer.MIN_VALUE;
+        for (int i = 0; i < adj.size(); i++) {
+            for (int j: adj.get(i)) {
+                n = Math.max(n, j);
+            }
+        }
+        boolean[] visited = new boolean[n + 1];
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                dfs(adj, visited, result, i);
+            }
+        }
+        return result;
+    }
+    
+    public void dfs(ArrayList<ArrayList<Integer>> adj, boolean[] visited, ArrayList<Integer> result, int s) {
+        visited[s] = true;
+        result.add(s);
+        for (int i : adj.get(s)) {
+            if (!visited[i]) {
+                dfs(adj, visited, result, i);
+            }
+        }
+        return;
+    }
+}
