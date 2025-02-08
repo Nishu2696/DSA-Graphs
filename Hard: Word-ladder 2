@@ -1,0 +1,97 @@
+Question Link: https://leetcode.com/problems/word-ladder-ii/
+
+class Solution {
+    Map<String, Set<String>> adjList = new HashMap<>();
+    List<String> currPath = new ArrayList<>();
+    List<List<String>> result = new ArrayList<>();
+    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+        if (!wordList.contains(endWord)) {
+            return result;
+        }
+
+        Set<String> dict = new HashSet<>(wordList);
+        bfs(beginWord, endWord, dict);
+        currPath.add(endWord);
+        backTrack(endWord, beginWord);
+        return result;
+    }
+
+    public void bfs(String startWord, String endWord, Set<String> dict) {
+        Queue<String> queue = new ArrayDeque<>();
+        queue.offer(startWord);
+
+        dict.remove(startWord);
+
+        Set<String> isEnqueued = new HashSet<>();
+        isEnqueued.add(startWord);
+
+        boolean found = false;
+        
+        while (!queue.isEmpty()) {
+            Set<String> visited = new HashSet<>();
+            for (int i = queue.size() - 1; i >= 0; i--) {
+                String currWord = queue.poll();
+                Set<String> neighbors = findNeighbors(currWord, dict);
+
+                for (String str: neighbors) {
+                    if (str.equals(endWord)) {
+                        found = true;
+                    }
+                    visited.add(str);
+                    adjList.putIfAbsent(str, new HashSet<>());
+                    adjList.get(str).add(currWord);
+
+                    if (isEnqueued.add(str)) {
+                        queue.offer(str);
+                    }
+                }
+            }
+
+            if (found) {
+                return;
+            }
+
+            for(String str: visited) {
+                dict.remove(str);
+            }
+        }
+    }
+
+    public Set<String> findNeighbors(String word, Set<String> dict) {
+        Set<String> neighbors = new HashSet<>();
+        char[] chars = word.toCharArray();
+
+        for (int i = 0; i < chars.length; i++) {
+            char oldWord = chars[i];
+
+            for (char ch = 'a'; ch <= 'z'; ch++) {
+                chars[i] = ch;
+                String newWord = new String(chars);
+                if (oldWord == ch || !dict.contains(newWord)) {
+                    continue;
+                }
+                neighbors.add(newWord);
+            }
+            chars[i] = oldWord;
+        }
+
+        return neighbors;
+    }
+
+    public void backTrack(String source, String destination) {
+        if (source.equals(destination)) {
+            List<String> tempPath = new ArrayList<>(currPath);
+            Collections.reverse(tempPath);
+            result.add(tempPath);
+            return;
+        }
+        if (!adjList.containsKey(source)) {
+            return;
+        }
+        for(String str:adjList.get(source)) {
+            currPath.add(str);
+            backTrack(str, destination);
+            currPath.remove(currPath.size() - 1);
+        }
+    }
+}
