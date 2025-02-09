@@ -1,0 +1,112 @@
+Question Link: https://leetcode.com/problems/course-schedule-ii/
+
+class Solution {
+    // BFS solution
+
+    // numCourses = 4
+    // linkedCounts = [0,0,0,0]
+    // linkedCounts = [0, 1, 1, 2]
+    // adjList = [[1,2], [3], [3], []]
+    // order = [0,0,0,0];
+    // order = [0]
+    // order = [0,1]
+    // order = [0,1,2]
+    // order = [0,1,2,3]
+
+    // public int[] findOrder(int numCourses, int[][] prerequisites) {
+    //     int[] linkedCounts = new int[numCourses];
+    //     List<List<Integer>> adjList = new ArrayList<>(numCourses);
+    //     initializeGraph(linkedCounts, adjList, prerequisites);
+    //     return bfs(linkedCounts, adjList);
+    // }
+    // public void initializeGraph(int[] linkedCounts, List<List<Integer>> adjList, int[][] prerequisites) {
+    //     int n = linkedCounts.length;
+    //     while (n > 0) {
+    //         adjList.add(new ArrayList<>());
+    //         n = n - 1;
+    //     }
+    //     for (int[] edge: prerequisites) {
+    //         linkedCounts[edge[0]] = linkedCounts[edge[0]] + 1;
+    //         adjList.get(edge[1]).add(edge[0]);
+    //     }
+    // }
+    // public int[] bfs(int[] linkedCounts, List<List<Integer>> adjList) {
+    //     int[] order = new int[linkedCounts.length];
+    //     Queue<Integer> queue = new LinkedList<>();
+    //     for (int i = 0; i < linkedCounts.length; i++) {
+    //         if (linkedCounts[i] == 0) {
+    //             queue.offer(i);
+    //         }
+    //     }
+    //     int visited = 0;
+    //     while(!queue.isEmpty()) {
+    //         int currentValue = queue.poll();
+    //         order[visited] = currentValue;
+    //         visited = visited + 1;
+    //         for (int values: adjList.get(currentValue)) {
+    //             linkedCounts[values] = linkedCounts[values] - 1;
+    //             if (linkedCounts[values] == 0) {
+    //                 queue.offer(values);
+    //             }
+    //         }
+    //     }
+    //     if (visited == linkedCounts.length) {
+    //         return order;
+    //     } else {
+    //         return new int[0];
+    //     }
+    // }
+
+    // DFS Solution
+
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        List<List<Integer>> adjList = new ArrayList<>();
+        for (int i = 0; i < numCourses; i++) {
+            adjList.add(new ArrayList<>());
+        }
+        for (int[] edge: prerequisites) {
+            adjList.get(edge[1]).add(edge[0]);
+        }
+
+        int[] visited = new int[numCourses];
+
+        for (int i = 0; i < numCourses; i++) {
+            // 0 = unvisisted
+            // 1 = visiting
+            // 2 = visited
+            visited[i] = 0;
+        }
+
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (!topoSort(adjList, result, visited,i)) {
+                return new int[0];
+            }
+        }
+        int[] output = new int[numCourses];
+        for (int i = 0; i < numCourses; i++) {
+            output[i] = result.get(numCourses - i - 1);
+        }
+        return output;
+    }
+
+    public boolean topoSort(List<List<Integer>> adjList, List<Integer> result, int[] visited, int index) {
+        int visitedValue = visited[index];
+        if (visitedValue == 2) {
+            return true;
+        }
+        if (visitedValue == 1) {
+            return false;
+        }
+        visited[index] = 1;
+        for(int value: adjList.get(index)) {
+            if (!topoSort(adjList, result, visited, value)) {
+                return false;
+            }
+        }
+        result.add(index);
+        visited[index] = 2;
+
+        return true;
+    }
+}
