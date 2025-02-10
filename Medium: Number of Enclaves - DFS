@@ -1,0 +1,37 @@
+Question Links: https://leetcode.com/problems/number-of-enclaves/
+
+class Solution {
+    public int numEnclaves(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                // dfs should be initiated only for those cells which are at the edges/boundaries
+                if ((i == 0 || j == 0 || i == m -1 || j == n - 1) && grid[i][j] == 1) {
+                    dfs(grid, i, j, m, n);
+                }
+            }
+        }
+        // finally we will be left with the cells = 1, which are not attached with the boundaries 1 directly or indirectly
+        int sum = 0;
+        for(int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if(grid[i][j] == 1) {
+                    sum = sum + 1;
+                }
+            }
+        }
+        return sum;
+    }
+    public void dfs(int[][] grid, int i, int j, int m, int n) {
+        grid[i][j] = 0;
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        for(int[] dirs: directions) {
+            int currRow = i + dirs[0];
+            int currColumn = j + dirs[1];
+            if(currRow >= 0 && currRow < m && currColumn >= 0 && currColumn < n && grid[currRow][currColumn] == 1) {
+                dfs(grid, currRow, currColumn, m, n);
+            }
+        }
+    }
+}
