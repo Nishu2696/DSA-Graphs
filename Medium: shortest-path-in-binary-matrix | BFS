@@ -1,0 +1,41 @@
+Question Link: https://leetcode.com/problems/shortest-path-in-binary-matrix/
+
+class Solution {
+    public int shortestPathBinaryMatrix(int[][] grid) {
+        if (grid[0][0] == 1) {
+            return -1;
+        }
+        // m = row
+        // n = column
+        // int[][] dirs = {m+1, 0}, {m-1, 0}, {0, n+1}, {0, n-1}, {m-1,n-1}, {m-1,n+1}, {m+1,n-1}, {m+1, n+1}
+        int[][] directions = {{1,0}, {-1,0}, {0,1}, {0,-1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+        int m = grid.length;
+        int n = grid[0].length;
+
+        Queue<int[]>queue = new LinkedList<>();
+        queue.add(new int[]{0,0,1});//starting from (0,0) and count as 1
+
+        while(!queue.isEmpty()) {
+            int[] cell = queue.poll();
+            int row = cell[0];
+            int column = cell[1];
+            int weight = cell[2];
+
+            if (row == m - 1 && column == n - 1) { // you have reached the end cell
+                return weight;
+            }
+
+            for(int[] dirs: directions) {
+                int x = dirs[0] + row;
+                int y = dirs[1] + column;
+
+                if (x >= 0 && x < m && y >= 0 && y < n && grid[x][y] == 0) {
+                    queue.add(new int[] {x, y, weight + 1});
+                    grid[x][y] = 1;
+                }
+            }
+        }
+
+        return -1;
+    }
+}
