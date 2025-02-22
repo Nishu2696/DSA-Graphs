@@ -1,0 +1,37 @@
+Question Link: https://www.geeksforgeeks.org/problems/implementing-floyd-warshall2042/1
+
+class Solution {
+    public void shortestDistance(int[][] mat) {
+        // Code here
+        int m = mat.length;
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < m; j++) {
+                if (mat[i][j] == -1) {
+                    mat[i][j] = (int)(1e9);
+                } 
+                if (i == j) {
+                    mat[i][j] = 0;
+                }
+            }
+        }
+        
+        for (int i = 0; i < m; i++) {
+            for (int source = 0; source < m; source++) {
+                for (int destination = 0; destination < m; destination++) {
+                    mat[source][destination] = Math.min(mat[source][destination], mat[source][i] + mat[i][destination]);
+                }
+            }
+        }
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < m; j++) {
+                if (mat[i][j] == (int)(1e9)) {
+                    mat[i][j] = -1;
+                }
+            }
+        }
+        
+        return;
+    }
+}
