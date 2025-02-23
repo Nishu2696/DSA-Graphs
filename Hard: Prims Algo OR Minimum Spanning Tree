@@ -1,0 +1,35 @@
+Question Link: https://www.geeksforgeeks.org/problems/minimum-spanning-tree/1
+
+class Solution {
+    static int spanningTree(int V, int E, List<List<int[]>> adj) {
+        // Code Here.
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b) -> a[1] - b[1]);
+        int[] visited = new int[V];
+        pq.add(new int[] {0,0});
+        int sum = 0;
+        
+        while (!pq.isEmpty()) {
+            int[] cell = pq.poll();
+            int node = cell[0];
+            int weight = cell[1];
+            
+            if (visited[node] == 1) {
+                continue;
+            }
+            
+            visited[node] = 1;
+            sum = sum + weight;
+            
+            for (int[] edge: adj.get(node)) {
+                int neighborNode = edge[0];
+                int neighborWeight = edge[1];
+                
+                if (visited[neighborNode] == 0) {
+                    pq.add(new int[] {neighborNode, neighborWeight});
+                }
+            }
+        }
+        
+        return sum;
+    }
+}
