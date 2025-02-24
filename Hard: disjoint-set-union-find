@@ -1,0 +1,32 @@
+Question Link: https://www.geeksforgeeks.org/problems/disjoint-set-union-find/1
+
+class GfG {
+    int find(int par[], int x) {
+        // add code here.
+        if (x == par[x]) {
+            return x;
+        }
+        return par[x] = find(par, par[x]);
+    }
+
+    void unionSet(int par[], int x, int z) {
+        // add code here.
+        int[] rank = new int[par.length];
+        
+        int x_rank = find(par, x);
+        int z_rank = find(par, z);
+        
+        if (x_rank == z_rank) {
+            return;
+        }
+        
+        if (rank[x_rank] > rank[z_rank]) {
+            par[z_rank] = par[x_rank];
+        } else if (rank[z_rank] > rank[x_rank]) {
+            par[x_rank] = par[z_rank];
+        } else {
+            par[x_rank] = z_rank;
+            rank[x_rank]++;
+        }
+    }
+}
