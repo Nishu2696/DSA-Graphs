@@ -1,0 +1,89 @@
+Question Link: https://leetcode.com/problems/accounts-merge/
+
+class Solution {
+    class UnionFind {
+        int[] parent;
+        int[] weight;
+
+        public UnionFind(int num) {
+            parent = new int[num];
+            weight = new int[num];
+
+            for (int i = 0; i < num; i++) {
+                parent[i] = i;
+                weight[i] = i;
+            }
+        }
+
+        public void union(int a, int b) {
+            int repA = root(a);
+            int repB = root(b);
+
+            if (repA == repB) {
+                return;
+            }
+
+            if (weight[repA] > weight[repB]) {
+                parent[repB] = repA;
+                weight[repA] = weight[repA] + weight[repB];
+            } else {
+                parent[repA] = repB;
+                weight[repB] = weight[repA] + weight[repB];
+            }
+        }
+
+        public int root(int a) {
+            if (parent[a] == a) {
+                return a;
+            }
+            parent[a] = root(parent[a]);
+            return parent[a];
+        }
+    }
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        int size = accounts.size();
+        UnionFind uf = new UnionFind(size);
+
+        // against the emailid, store the index in map
+        Map<String, Integer> emailToId = new HashMap<>();
+        for (int i = 0; i < size; i++) {
+            List<String> details = accounts.get(i);
+            for (int j = 1; j < details.size(); j++) {
+                String email = details.get(j);
+
+                if (emailToId.containsKey(email)) {
+                    uf.union(i, emailToId.get(email));
+                } else {
+                    emailToId.put(email, i);
+                }
+            }
+        }
+
+        // create list of email id against the similar parent indexes
+        Map<Integer, List<String>> idToEmail = new HashMap<>();
+        for (String key: emailToId.keySet()) {
+            int root = uf.root(emailToId.get(key));
+
+            if (!idToEmail.containsKey(root)) {
+                idToEmail.put(root, new ArrayList<>());
+            }
+            idToEmail.get(root).add(key);
+        }
+        // idToEmail = {
+        //     1: [johnsmith@mail.com, john_newyork@mail.com, john00@mail.com]
+        //     2: [mary@mail.com]
+        //     3: [johnnybravo@mail.com]
+        // }
+
+        List<List<String>> mergedDetails = new ArrayList<>();
+
+        for (Integer id: idToEmail.keySet()) {
+            List<String> emails = idToEmail.get(id);
+            Collections.sort(emails);
+            emails.add(0, accounts.get(id).get(0)); // at the front need to add name
+            mergedDetails.add(emails);
+        }
+
+        return mergedDetails;
+    }
+}
