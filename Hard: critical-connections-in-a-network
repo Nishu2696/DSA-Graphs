@@ -1,0 +1,55 @@
+Question Link: https://leetcode.com/problems/critical-connections-in-a-network/
+
+class Solution {
+    public List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {
+        List<List<Integer>> graph = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            graph.add(new ArrayList<>());
+        }
+
+        for (List<Integer> edge: connections) {
+            graph.get(edge.get(0)).add(edge.get(1));
+            graph.get(edge.get(1)).add(edge.get(0));
+        }
+
+        int[] visited = new int[n];
+        Arrays.fill(visited, -1);
+
+        int[] seen = new int[n];
+        Arrays.fill(seen, -1);
+
+        int time = 0;
+
+        List<List<Integer>> answer = new ArrayList<>();
+        dfs(graph, answer, visited, seen, time, 0, -1);
+        return answer;
+    }
+
+    public void dfs(List<List<Integer>> graph, List<List<Integer>> answer, int[] visited, int[] seen, int time, int index, int parent) {
+        visited[index] = time;
+        seen[index] = time;
+
+        time = time + 1;
+
+        for (Integer edge: graph.get(index)) {
+            if (parent == edge) {
+                continue;
+            }
+            if (visited[edge] != -1) {
+                seen[index] = Math.min(seen[index], visited[edge]);
+                continue;
+            }
+            dfs(graph, answer, visited, seen, time, edge, index);
+            seen[index] = Math.min(seen[index], seen[edge]);
+
+            if (visited[index] < seen[edge]) {
+                List<Integer> output = new ArrayList<>();
+                output.add(index);
+                output.add(edge);
+                answer.add(output);
+            }
+        }
+
+        return;
+    }
+}
