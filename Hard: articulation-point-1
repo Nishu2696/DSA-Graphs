@@ -1,0 +1,64 @@
+Question Link: https://www.geeksforgeeks.org/problems/articulation-point-1/1
+
+class Solution
+{
+    //Function to return Breadth First Traversal of given graph.
+    public int timer = 1;
+    public ArrayList<Integer> articulationPoints(int V,ArrayList<ArrayList<Integer>> adj)
+    {
+        // Code here
+        int[] visited = new int[V];
+        int[] low = new int[V];
+        int[] seen = new int[V];
+        int[] mark = new int[V];
+        
+        for (int i = 0; i < V; i++) {
+            if (visited[i] == 0) {
+                dfs(adj, visited, low, seen, mark, i, -1);
+            }
+        }
+        
+        ArrayList<Integer> answer = new ArrayList<>();
+        
+        for (int i = 0; i < V; i++) {
+            if (mark[i] == 1) {
+                answer.add(i);
+            }
+        }
+        
+        if (answer.size() == 0) {
+            answer.add(-1);
+        } 
+        return answer;
+    }
+    
+    public void dfs(ArrayList<ArrayList<Integer>> adj, int[] visited, int[] low, int[] seen, int[] mark, int node, int parent) {
+        visited[node] = 1;
+        low[node] = timer;
+        seen[node] = timer;
+        
+        timer = timer + 1;
+        int count = 0;
+        
+        for (Integer val: adj.get(node)) {
+            if (val == parent) {
+                continue;
+            }
+            if (visited[val] == 0) {
+                dfs(adj, visited, low, seen, mark, val, node);
+                low[node] = Math.min(low[node], low[val]);
+                
+                if (low[val] >= seen[node] && parent != -1) {
+                    mark[node] = 1;
+                }
+                count++;
+            } else {
+                low[node] = Math.min(low[node], seen[val]);
+            }
+        }
+        
+        if (count > 1 && parent == -1) {
+            mark[node] = 1;
+        }
+    }
+}
