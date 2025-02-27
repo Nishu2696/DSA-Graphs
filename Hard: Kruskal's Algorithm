@@ -1,0 +1,88 @@
+Question Link: https://www.geeksforgeeks.org/problems/minimum-spanning-tree/1
+
+class Edge implements Comparable<Edge> {
+        int source, destination, weight;
+        Edge (int source, int destination, int weight) {
+            this.source = source;
+            this.destination = destination;
+            this.weight = weight;
+        }
+        
+        public int compareTo(Edge compareEdge) {
+            return this.weight - compareEdge.weight;
+        }
+    }
+    
+    class Disjointset {
+        List<Integer> rank = new ArrayList<>();
+        List<Integer> parent = new ArrayList<>();
+        List<Integer> size = new ArrayList<>();
+        
+        public Disjointset (int num) {
+            for (int i = 0; i <= num; i++) {
+                rank.add(0);
+                parent.add(i);
+                size.add(1);
+            }
+        }
+        
+        public int findPair(int node) {
+            if (node == parent.get(node)) {
+                return node;
+            }
+            int value = findPair(parent.get(node));
+            parent.set(node, value);
+            return parent.get(node);
+        }
+        
+        public void unionBySize(int nodeA, int nodeB) {
+            int rankA = findPair(nodeA);
+            int rankB = findPair(nodeB);
+            
+            if (rankA == rankB) {
+                return;
+            }
+            
+            if (size.get(rankA) < size.get(rankB)) {
+                parent.set(rankA, rankB);
+                size.set(rankB, size.get(rankA) + size.get(rankB));
+            } else {
+                parent.set(rankB, rankA);
+                size.set(rankA, size.get(rankA) + size.get(rankB));
+            }
+        }
+    }
+    
+class Solution {
+    
+    
+    static int spanningTree(int V, int E, List<List<int[]>> adj) {
+        // Code Here.
+        List<Edge> edges = new ArrayList<>();
+        for (int i = 0; i < V; i++) {
+            for (int[] val: adj.get(i)) {
+                int weight = val[1];
+                int dest = val[0];
+                Edge temp = new Edge(i, dest, weight);
+                edges.add(temp);
+            }
+        }
+        Disjointset ds = new Disjointset(V);
+        Collections.sort(edges);
+        int result = 0;
+        
+        for (int i = 0; i < edges.size(); i++) {
+            int source = edges.get(i).source;
+            int destination = edges.get(i).destination;
+            int weight = edges.get(i).weight;
+            
+            if (ds.findPair(source) != ds.findPair(destination)) {
+                result = result + weight;
+                ds.unionBySize(source, destination);
+            }
+        }
+        
+        return result;
+        
+    }
+}
