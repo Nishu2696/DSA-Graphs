@@ -1,0 +1,87 @@
+Question Link: https://www.geeksforgeeks.org/problems/number-of-islands/1
+
+class Solution {
+    
+    class DisJointSet {
+        List<Integer> rank = new ArrayList<>();
+        List<Integer> parent = new ArrayList<>();
+        List<Integer> size = new ArrayList<>();
+        
+        public DisJointSet(int num) {
+            for (int i = 0; i <= num; i++) {
+                rank.add(0);
+                parent.add(i);
+                size.add(1);
+            }
+        }
+        
+        public int findPair(int node) {
+            if (node == parent.get(node)) {
+                return node;
+            }
+            int value = findPair(parent.get(node));
+            parent.set(node, value);
+            return parent.get(node);
+        }
+        
+        public void unionBySize(int nodeA, int nodeB) {
+            int rankA = findPair(nodeA);
+            int rankB = findPair(nodeB);
+            
+            if (rankA == rankB) {
+                return;
+            }
+            
+            if (size.get(rankA) < size.get(rankB)) {
+                parent.set(rankA, rankB);
+                size.set(rankB, size.get(rankA) + size.get(rankB));
+            } else {
+                parent.set(rankB, rankA);
+                size.set(rankA, size.get(rankA) + size.get(rankB));
+            }
+        }
+    }
+    
+    public List<Integer> numOfIslands(int rows, int cols, int[][] operators) {
+        //Your code here
+        DisJointSet ds = new DisJointSet(rows * cols);
+        int count = 0;
+        int[][] visited = new int[rows][cols];
+        
+        List<Integer> ans = new ArrayList<>();
+        int[][] directions = {{-1,0}, {1,0}, {0,1}, {0,-1}};
+        
+        for (int[] edge: operators) {
+            int i = edge[0];
+            int j = edge[1];
+            
+            if (visited[i][j] == 1) {
+                ans.add(count);
+                continue;
+            }
+            visited[i][j] = 1;
+            count++;
+            
+            for (int[] dirs: directions) {
+                int x = dirs[0] + i;
+                int y = dirs[1] + j;
+                
+                if (x >= 0 && x < rows && y >= 0 && y < cols && visited[x][y] == 1) {
+                    int node = i * cols + j;
+                    int adjNode = x * cols + y;
+                    
+                    if (ds.findPair(node) != ds.findPair(adjNode)) {
+                        count--;
+                        ds.unionBySize(node, adjNode);
+                    }
+                }
+            }
+            
+            ans.add(count);
+            
+        }
+        
+        return ans;
+    }
+    
+}
